@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
 use App\Models\Apiqu;
 use App\Models\DetailAyat;
-
+use App\Models\DetailTafsir;
 class ApiquController extends Controller
 {
     public function apiqu() {
@@ -106,6 +106,60 @@ class ApiquController extends Controller
             'code' => 200,
             'message' => 'successfully',
             'data' => $ayatDe,
+        ]);
+    }
+
+    public function tafsirIm() {
+        
+        $client = new Client([
+            'timeout' => 3600,
+            'connect_timeout' => 3600,
+            'retry' => 10,
+        ]);
+
+        
+        for ($nomor = 1; $nomor <= 114; $nomor++) {
+            $url = "https://equran.id/api/v2/tafsir/{$nomor}";
+            $response = Http::get($url);
+
+            
+            if ($response->successful()) {
+                $data = $response->json()['data']['tafsir'];
+
+                
+                foreach ($data as $ayat) {
+                    
+                    DetailTafsir::updateOrCreate([
+                        'nomorSurat' => $nomor,
+                        'nomorAyat' => $ayat['ayat'],
+                    ],
+                    [
+                        'teksTafsir' => $ayat['teks'],
+                    ]);
+                }
+            } else {
+                
+                return response()->json([
+                    'code' => 500,
+                    'message' => 'Failed'
+                ], 500);
+            }
+        }
+
+        
+        return response()->json([
+            'code' => 200,
+            'message' => 'successfully'
+        ]);
+    }
+
+    
+    public function tafsirDe($nomor) {
+        $tafsirDe = DetailTafsir::where('nomorSurat', $nomor)->get();
+        return response()->json([
+            'code' => 200,
+            'message' => 'Data tafsir retrieved successfully',
+            'data' => $tafsirDe,
         ]);
     }
 }
