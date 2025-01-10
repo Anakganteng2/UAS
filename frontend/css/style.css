@@ -1,0 +1,24 @@
+.navbar {
+  background-color: #87ceeb !important;
+}
+
+body {
+  padding-top: 56px;
+}
+
+body,
+strong,
+h3,
+h6,
+p {
+  font-family: Arial, sans-serif;
+}
+
+.daftar-body {
+  cursor: pointer;
+  transition: 0.8s;
+}
+
+.daftar-body:hover {
+  background-color: #87ceeb;
+}
